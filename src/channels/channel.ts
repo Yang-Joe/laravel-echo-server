@@ -1,6 +1,7 @@
 import { PresenceChannel } from './presence-channel';
 import { PrivateChannel } from './private-channel';
 import { Log } from './../log';
+var request = require('request');
 
 export class Channel {
     /**
@@ -42,15 +43,24 @@ export class Channel {
      * @return {void}
      */
     join(socket, data): void {
-        if (data.channel) {
+        if (data.channel) { 
             if (this.isPrivate(data.channel)) {
                 this.joinPrivate(socket, data);
             } else {
                 socket.join(data.channel);
                 this.onJoin(socket, data.channel);
             }
+            var formData = {
+                uuid: data.channel,
+                online: '1'
+            };
+            request.post({url:'http://localhost:8080/api/v1/customer/online', formData: formData}, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    return console.error('upload failed:', err);
+                }
+                console.log(body);
+            });
         }
-
         this.onDisconnect(socket, data.channel);
     }
 
@@ -136,7 +146,19 @@ export class Channel {
      * @return {void}
      */
     onDisconnect(socket: any, channel: string): void {
-        socket.on('disconnect', () => this.leave(socket, channel));
+        socket.on('disconnect', () => {
+            var formData = {
+                uuid: channel,
+                online: '0'
+            };
+            request.post({url:'http://localhost:8080/api/v1/customer/online', formData: formData}, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    return console.error('upload failed:', err);
+                }
+                console.log(body);
+            });
+            this.leave(socket, channel);
+        });
 
         if (this.options.devMode) {
             Log.info(`[${new Date().toLocaleTimeString()}] - ${socket.id} left channel: ${channel}`);
