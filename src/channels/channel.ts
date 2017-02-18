@@ -58,7 +58,11 @@ export class Channel {
                 if (err) {
                     return console.error('upload failed:', err);
                 }
-                console.log(body);
+            });
+            request.post({url:'http://localhost:8080/api/v1/user/disconnect', formData: formData}, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    return console.error('upload failed:', err);
+                }
             });
         }
         this.onDisconnect(socket, data.channel);
@@ -155,7 +159,11 @@ export class Channel {
                 if (err) {
                     return console.error('upload failed:', err);
                 }
-                console.log(body);
+            });
+            request.post({url:'http://localhost:8080/api/v1/user/disconnect', formData: formData}, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    return console.error('upload failed:', err);
+                }
             });
             this.leave(socket, channel);
         });
