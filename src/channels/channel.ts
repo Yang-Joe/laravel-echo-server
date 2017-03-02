@@ -52,7 +52,8 @@ export class Channel {
             }
             var formData = {
                 uuid: data.channel,
-                online: '1'
+                online: '1',
+                socketID: socket.id
             };
             request.post({url:'http://localhost:8080/api/v1/customer/online', formData: formData}, function optionalCallback(err, httpResponse, body) {
                 if (err) {
@@ -153,8 +154,9 @@ export class Channel {
         socket.on('disconnect', () => {
             var formData = {
                 uuid: channel,
-                online: '0'
-            };
+                online: '0',
+		socketID: socket.id
+            }
             request.post({url:'http://localhost:8080/api/v1/customer/online', formData: formData}, function optionalCallback(err, httpResponse, body) {
                 if (err) {
                     return console.error('upload failed:', err);
